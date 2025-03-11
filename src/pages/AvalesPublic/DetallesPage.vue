@@ -1,29 +1,47 @@
 <template>
   <div class="q-pa-lg">
     <q-table
+      bordered
+      dense
+      virtual-scroll
       title="Avales de Publicación"
-      title-class="text-bold text-color"
+      title-class="text-bold "
       :rows="rows"
       :columns="columns"
       row-key="name"
       :filter="search"
-      dense
       no-data-label="No hay datos disponibles."
       no-results-label="No se encontraron resultados para tu búsqueda."
       :loading="isLoading"
-      loading-label="Cargando..."
-      rows-per-page-label="Avales por Página"
+      rows-per-page-options="7"
     >
+      <template v-slot:loading>
+        <q-inner-loading showing color="primary" />
+      </template>
       <template v-slot:top-right>
         <div class="row q-gutter-md">
           <q-btn
+            v-if="user.isAdmin"
+            label="Nuevo Aval"
+            icon="add"
+            color="primary"
+            size="sm"
+            align="left"
+            class="text-bold"
+            dense
+            to="/crear_aval_public"
+            ><q-tooltip> Registrar Nuevo Aval</q-tooltip></q-btn
+          >
+          <q-btn
+            icon="expand_less"
             label="Menos Datos"
             color="primary"
             size="sm"
             align="left"
             dense
             to="/lista_avales_public"
-          />
+            ><q-tooltip> Mostrar menos Datos </q-tooltip></q-btn
+          >
           <q-input dense outlined v-model="search" placeholder="Buscar" />
         </div>
       </template>
@@ -66,12 +84,12 @@
         </q-tr>
       </template>
     </q-table>
-    <q-dialog v-model="editDialogOpen">
-      <q-card style="width: 400px">
+    <q-dialog v-model="editDialogOpen" backdrop-filter="blur(4px)">
+      <q-card style="width: 500px; height: 500px">
         <q-card-section>
-          <div class="text-h6 text-color">Editar Recurso</div>
+          <div class="text-h6">Editar Aval</div>
         </q-card-section>
-
+        <q-separator inset />
         <q-card-section>
           <q-input autogrow v-model="editForm.nombre" label="Nombre" />
           <q-input autogrow v-model="editForm.apellidos" label="Apellidos" />
@@ -140,14 +158,12 @@
             v-model="editForm.issn"
             label="ISSN"
             class="form-item"
-            :rules="issnRules"
           />
           <q-input
             v-if="editForm.tipo_publicacion === 'Revista Digital'"
             v-model="editForm.e_issn"
             label="E-ISSN"
             class="form-item"
-            :rules="eissnRules"
           />
           <q-input
             v-if="
@@ -157,7 +173,6 @@
             v-model="editForm.isbn"
             label="ISBN"
             class="form-item"
-            :rules="isbnRules"
           />
           <q-input
             v-model="editForm.grupo"
@@ -180,12 +195,7 @@
               @dialogClosed="hideGrupoDialog"
             />
           </q-dialog>
-          <q-input
-            autogrow
-            v-model="editForm.url"
-            label="URL"
-
-          />
+          <q-input autogrow v-model="editForm.url" label="URL" />
           <q-checkbox v-model="editForm.cdrom_dvd" label="CDROM/DVD" />
           <q-checkbox v-model="editForm.base_de_datos" label="Base de Datos" />
           <q-input v-model="editForm.tomo" label="Tomo" />
@@ -193,14 +203,8 @@
         </q-card-section>
 
         <q-card-actions align="right">
-          <q-btn  rounded label="Cancelar" v-close-popup />
-          <q-btn
-
-            rounded
-            color="primary"
-            label="Guardar"
-            @click="saveEdit"
-          />
+          <q-btn rounded label="Cancelar" v-close-popup />
+          <q-btn rounded color="primary" label="Guardar" @click="saveEdit" />
         </q-card-actions>
       </q-card>
     </q-dialog>
@@ -360,24 +364,7 @@ const columns = [
     filter: true,
   },
 ];
-/////reglas
-type Rule = (value: string) => boolean | string;
-const issnRules: Rule[] = [
-  (v) => !!v || 'El ISSN es requerido',
-  (v) =>
-    v.length <= 8 || 'El lugar de publicación excede el límite de 8 caracteres',
-];
-const eissnRules: Rule[] = [
-  (v) => !!v || 'El E-ISSN es requerido',
-  (v) =>
-    v.length <= 8 || 'El lugar de publicación excede el límite de 8 caracteres',
-];
-const isbnRules: Rule[] = [
-  (v) => !!v || 'El ISBN es requerido',
-  (v) =>
-    v.length <= 13 ||
-    'El lugar de publicación excede el límite de 13 caracteres',
-];
+
 const fetchUserData = async () => {
   try {
     const authToken = localStorage.getItem('authToken');
@@ -414,7 +401,7 @@ onMounted(async () => {
         'Content-Type': 'application/json',
       },
     };
-    const response = await api.get('/api/profesores/',config);
+    const response = await api.get('/api/profesores/', config);
     console.log('Formulario enviado con éxito:', response.data.results);
     rows.value = response.data.results;
   } catch (error) {
@@ -487,6 +474,43 @@ watch(
   },
   { deep: true }
 );
+function formatWithInfiniteSeparators(value) {
+  // Convertir el valor a una cadena y eliminar caracteres no numéricos
+  let cleaned = ('' + value).replace(/\D/g, '');
+
+  // Dividir la cadena en grupos de tres dígitos
+  let groups = [];
+  for (let i = 0; i < cleaned.length; i += 4) {
+    groups.push(cleaned.substr(i, 4));
+  }
+
+  // Concatenar los grupos con guiones
+  let result = groups.join('-');
+
+  return result;
+}
+watch(
+  () => editForm.isbn,
+  (newValue) => {
+    editForm.isbn = formatWithInfiniteSeparators(newValue);
+  },
+  { immediate: true }
+);
+watch(
+  () => editForm.issn,
+  (newValue) => {
+    editForm.issn = formatWithInfiniteSeparators(newValue);
+  },
+  { immediate: true }
+);
+
+watch(
+  () => editForm.e_issn,
+  (newValue) => {
+    editForm.e_issn = formatWithInfiniteSeparators(newValue);
+  },
+  { immediate: true }
+);
 
 //boton editar
 const editRow = (row: RowType) => {
@@ -522,7 +546,11 @@ const saveEdit = async () => {
       },
     };
     $q.loading.show();
-    await api.put(`/api/profesores/${selectedRow.value.id}/`, { ...editForm },config);
+    await api.put(
+      `/api/profesores/${selectedRow.value.id}/`,
+      { ...editForm },
+      config
+    );
 
     const index = rows.value.findIndex(
       (row) => row.id === selectedRow.value.id
@@ -541,7 +569,7 @@ const saveEdit = async () => {
   $q.notify({
     type: 'positive',
     message: '¡Aval Actualizado Correctamente!',
-    position: 'top-right',
+    position: 'bottom-right',
   });
 };
 //boton mostrar
@@ -551,7 +579,8 @@ const showRow = (row: null) => {
 };
 // boton eliminar
 async function eliminar(row: { id: null }) {
-  try {const authToken = localStorage.getItem('authToken'); // Asume que tienes un authToken almacenado
+  try {
+    const authToken = localStorage.getItem('authToken'); // Asume que tienes un authToken almacenado
     const config = {
       headers: {
         Authorization: `Token ${authToken}`,
@@ -568,7 +597,7 @@ async function eliminar(row: { id: null }) {
       .onOk(() => {
         $q.loading.show();
         api
-          .delete(`/api/profesores/${row.id}/`,config)
+          .delete(`/api/profesores/${row.id}/`, config)
           .then(() => {
             console.log('Recurso eliminado con éxito');
             rows.value = rows.value.filter((item) => item.id !== row.id);
@@ -576,7 +605,7 @@ async function eliminar(row: { id: null }) {
             $q.notify({
               type: 'positive', // Cambiado a positive para indicar éxito
               message: '¡Aval Eliminado Correctamente!',
-              position: 'top-right',
+              position: 'bottom-right',
             });
           })
           .catch((error) => {
@@ -585,7 +614,7 @@ async function eliminar(row: { id: null }) {
             $q.notify({
               type: 'negative',
               message: 'Hubo un error al eliminar el Aval.',
-              position: 'top-right',
+              position: 'bottom-right',
             });
           });
       });

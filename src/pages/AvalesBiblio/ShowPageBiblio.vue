@@ -137,14 +137,28 @@
           dict@reduc.edu.cu. http://infocien.reduc.edu.cu
         </div>
       </div>
-      <q-btn
-        color="primary"
-        rounded
-        label="Exportar a PDF"
-        @click="exportToPDF"
-        class="btn-export mt-4 text-weight-bolder"
-        style="margin-top: 20px; margin-bottom: 20px"
-      />
+      <div>
+        <q-btn
+          icon="arrow_back"
+          rounded
+          size="sm"
+          label="Volver"
+          class="form-item text-weight-bolder"
+          color="primary"
+          style="margin-top: 20px; margin-bottom: 20px; margin-right: 10px"
+          @click="goBack"
+        />
+        <q-btn
+          icon="print"
+          size="sm"
+          color="primary"
+          rounded
+          label="Exportar a PDF"
+          @click="exportToPDF"
+          class="btn-export mt-4 text-weight-bolder"
+          style="margin-top: 20px; margin-bottom: 20px"
+        />
+      </div>
     </div>
   </q-page>
 </template>
@@ -152,6 +166,7 @@
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue';
 import { useQuasar } from 'quasar';
+import { useRouter } from 'vue-router';
 import { useRoute } from 'vue-router';
 import { api } from 'src/boot/axios';
 import jsPDF from 'jspdf';
@@ -177,9 +192,12 @@ interface ResponseItem {
   folio: string;
   fecha: string;
 }
-
+const router = useRouter();
 const route = useRoute();
 const id = route.params.id;
+const goBack = () => {
+  router.back();
+};
 const $q = useQuasar();
 const response = ref<ResponseItem>({
   nombre: '',
@@ -250,7 +268,7 @@ const exportToPDF = () => {
   $q.notify({
     type: 'positive',
     message: '¡Aval Exportado Correctamente!',
-    position: 'top-right',
+    position: 'bottom-right',
   });
 };
 </script>

@@ -13,7 +13,9 @@
       <q-form @submit="onSubmit" id="form">
         <div class="q-gutter-md row justify-center items-center">
           <div class="q-gutter-xl q-gutter-y-md row justify-around">
-            <div class="column q-gutter-md-y-sm">
+            <div
+              class="column q-gutter-md-y-sm suggested-authors-list-container"
+            >
               <div><p class="text-bold text-body2">Nombre</p></div>
               <q-input
                 style="width: 200px"
@@ -25,6 +27,20 @@
                 class="form-item"
                 :rules="nombreRules"
               />
+              <ul
+                style="max-height: 150px"
+                v-if="autoresSugeridos.length > 0"
+                class="suggested-authors-list"
+              >
+                <li
+                  v-for="autor in autoresSugeridos"
+                  :key="autor.id"
+                  @click="selectAuthor(autor)"
+                >
+                  {{ autor.nombre }}
+                  {{ autor.apellidos }}
+                </li>
+              </ul>
             </div>
             <div class="column q-gutter-md-y-sm">
               <div><p class="text-bold text-body2">Apellidos</p></div>
@@ -272,6 +288,7 @@
         <q-separator inset class="container" />
         <div class="row justify-end items-center">
           <q-btn
+            icon="arrow_back"
             rounded
             size="sm"
             label="Volver"
@@ -281,6 +298,7 @@
             @click="goBack"
           />
           <q-btn
+            icon="save"
             rounded
             size="sm"
             label="Guardar"
@@ -359,7 +377,7 @@ const showRevBiblioDialog = ref(false);
 const hideRevBiblioDialog = () => {
   showRevBiblioDialog.value = false;
 };
-
+let isSearching = true;
 const $q = useQuasar();
 const showSelectorDepartamento = ref(false);
 const closeFirstDialogAndUpdateModel = () => {
@@ -368,6 +386,9 @@ const closeFirstDialogAndUpdateModel = () => {
 const goBack = () => {
   router.back();
 };
+const autoresSugeridos = ref([]);
+const mostrarAutoresSugeridos = ref(false);
+
 //metodos
 function capitalizeWords(text: string): string {
   return text
@@ -392,7 +413,30 @@ watch(
   },
   { deep: true }
 );
-
+watch(
+  () => form.nombre,
+  async (newVal, oldVal) => {
+    if (isSearching === true && newVal.length >= 3) {
+      await buscarAutores();
+    } else {
+      autoresSugeridos.value = [];
+      mostrarAutoresSugeridos.value = false;
+    }
+  },
+  { immediate: true }
+);
+watch(
+  () => form.apellidos,
+  async (newVal, oldVal) => {
+    if (isSearching === true && form.nombre.length >= 3) {
+      await buscarAutores();
+    } else {
+      autoresSugeridos.value = [];
+      mostrarAutoresSugeridos.value = false;
+    }
+  },
+  { immediate: true }
+);
 // Reglas de validación
 const nombreRules: Rule[] = [
   (v) => !!v || 'El Nombre es requerido',
@@ -435,7 +479,7 @@ function onSubmit() {
         $q.notify({
           type: 'negative',
           message: 'Hubo un error al enviar el formulario.',
-          position: 'top-right',
+          position: 'bottom-right',
         });
       } else {
         $q.loading.hide();
@@ -443,7 +487,7 @@ function onSubmit() {
           type: 'negative',
           message:
             'Hubo un error al enviar el formulario. Por favor, inténtalo de nuevo.',
-          position: 'top-right',
+          position: 'bottom-right',
         });
       }
       console.error('Error al enviar el formulario:', error);
@@ -451,10 +495,45 @@ function onSubmit() {
   $q.notify({
     type: 'positive',
     message: '¡Aval Registrado con Éxito !',
-    position: 'top-right',
+    position: 'bottom-right',
   });
 }
+async function buscarAutores() {
+  // Concatena nombre y apellidos con un espacio entre ellos
+  const terminoNombre = form.nombre;
+  const terminoApellidos = form.apellidos;
 
-// Declaración de variables reactivas adicionales si es necesario
-const errorMessage = ref('');
+  // Verifica si la longitud del término de búsqueda es mayor o igual a 3
+  if (terminoNombre.length >= 3 || terminoApellidos.length >= 3) {
+    const authToken = localStorage.getItem('authToken'); // Asume que tienes un authToken almacenado
+    const config = {
+      headers: {
+        Authorization: `Token ${authToken}`,
+        'Content-Type': 'application/json',
+      },
+      params: { nombre: terminoNombre, apellidos: terminoApellidos }, // Usa el término de búsqueda concatenado y ajustado aquí
+    };
+    try {
+      const response = await api.get('/api/autores/buscar', config); // Usando axios.get con config
+      autoresSugeridos.value = response.data;
+      mostrarAutoresSugeridos.value = true;
+    } catch (error) {
+      console.error('Error buscando autores:', error);
+    }
+  } else {
+    autoresSugeridos.value = [];
+    mostrarAutoresSugeridos.value = false;
+  }
+}
+
+function selectAuthor(author) {
+  if (author) {
+    form.nombre = author.nombre;
+    form.apellidos = author.apellidos;
+    form.departamento = author.departamento;
+    autoresSugeridos.value = [];
+    mostrarAutoresSugeridos.value = false;
+    isSearching = false; // Detiene la búsqueda
+  }
+}
 </script>

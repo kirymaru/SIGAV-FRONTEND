@@ -12,6 +12,7 @@
         </div>
         <div class="column q-gutter-md justify-center items-center">
           <q-input
+            dense
             v-model="email"
             label="Correo Electrónico"
             lazy-rules
@@ -22,6 +23,7 @@
 
           <div>
             <q-btn
+              size="sm"
               rounded
               label="Iniciar sesión"
               type="submit"
@@ -90,7 +92,7 @@ const navigateHome = () => {
   $q.notify({
     type: 'positive',
     message: '¡Inicio de sesión exitoso!',
-    position: 'top-right',
+    position: 'bottom-right',
   });
 };
 </script>

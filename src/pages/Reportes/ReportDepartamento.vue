@@ -1,37 +1,54 @@
 <template>
   <div class="q-pa-lg">
-    <q-card class="column q-gutter-y-md">
+    <q-card class="column q-gutter-y-md rounded-card">
       <div class="column text-subtitle1 text-bold">
-        <p class="text-h6 text-bold">Cantidad de avales en el Departamento:</p>
-        <q-input
-          style="max-width: 250px"
-          autogrow
-          filled
-          v-model="departamentoSeleccionado"
-          label="Seleccione un Departamento"
-          @click="showSelectorDepartamento = true"
-          @update:model-value="mostrarAvales"
-        />
-        <q-dialog v-model="showSelectorDepartamento" persistent>
-          <SelectorDepartamento
+        <q-card-section>
+          <div class="text-h6 text-bold">
+            Cantidad de Avales por Departamento y Tipo de Aval :
+          </div>
+          <q-separator />
+        </q-card-section>
+        <q-card-section>
+          <div>
+            <p class="text-bold text-body2">Departamento de Trabajo</p>
+          </div>
+          <q-input
+            style="max-width: 250px"
+            autogrow
+            outlined
+            dense
             v-model="departamentoSeleccionado"
-            :open-first-dialog-automatically="true"
-            @close-first-dialog="closeFirstDialogAndUpdateModel"
+            label="Seleccione un Departamento"
+            @click="showSelectorDepartamento = true"
             @update:model-value="mostrarAvales"
           />
-        </q-dialog>
+          <q-dialog v-model="showSelectorDepartamento" persistent>
+            <SelectorDepartamento
+              v-model="departamentoSeleccionado"
+              :open-first-dialog-automatically="true"
+              @close-first-dialog="closeFirstDialogAndUpdateModel"
+              @update:model-value="mostrarAvales"
+            />
+          </q-dialog>
+        </q-card-section>
       </div>
       <q-separator />
-      <div class="row justify-around text-body1 text-bold">
-        <div>Aval de Publicación: {{ datos?.avales_por_tipo['Profesor'] }}</div>
-        <div>Aval de Tutoría: {{ datos?.avales_por_tipo['avales_tuto'] }}</div>
-        <div>
-          Aval de Bibliografía: {{ datos?.avales_por_tipo['avales_biblio'] }}
+      <q-card-section>
+        <div class="row justify-around text-body1 text-bold">
+          <div>
+            Aval de Publicación: {{ datos?.avales_por_tipo['Profesor'] }}
+          </div>
+          <div>
+            Aval de Tutoría: {{ datos?.avales_por_tipo['avales_tuto'] }}
+          </div>
+          <div>
+            Aval de Bibliografía: {{ datos?.avales_por_tipo['avales_biblio'] }}
+          </div>
+          <div>Total: {{ datos?.total_avales }}</div>
         </div>
-        <div>Total: {{ datos?.total_avales }}</div>
-      </div>
+      </q-card-section>
     </q-card>
-    <q-card>
+    <q-card class="rounded-card">
       <q-card-section>
         <div class="text-h6 text-bold">
           Cantidad de Avales por Departamento y Facultad:
@@ -236,6 +253,7 @@ onMounted(async () => {
       }
       avalesPorFacultad[facultad].total = sumaTotal;
     });
+    cargarDatos();
     $q.loading.hide();
   } catch (error) {
     $q.loading.hide();
@@ -269,3 +287,4 @@ watch(departamentoSeleccionado, async (nuevoValor, antiguoValor) => {
   }
 });
 </script>
+<style scoped></style>

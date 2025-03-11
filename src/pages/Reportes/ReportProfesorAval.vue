@@ -1,23 +1,38 @@
 <template>
   <div class="q-pa-lg">
     <q-table
+      bordered
+      dense
       :title="'Avales Registrados de: ' + nombre + ' ' + apellidos"
-      title-class="text-bold text-color"
+      title-class="text-bold"
       :rows="rows"
       :columns="columnas"
       row-key="id"
       :filter="search"
       class="q-mt-md"
-      dense
       no-data-label="No hay datos disponibles."
       no-results-label="No se encontraron resultados para tu búsqueda."
       :loading="isLoading"
       loading-label="Cargando..."
-      rows-per-page-label="Avales por Página"
+      rows-per-page-options="8"
     >
-      <template v-slot:top-right>
-        <q-input dense outlined v-model="search" placeholder="Buscar" />
+      <template v-slot:loading>
+        <q-inner-loading showing color="primary" />
       </template>
+      <template v-slot:top-right>
+        <div class="row q-gutter-md">
+          <q-btn
+            icon="arrow_back"
+            label="Volver"
+            color="primary"
+            size="sm"
+            align="left"
+            class="text-bold"
+            dense
+            @click="goBack"
+          />
+          <q-input dense outlined v-model="search" placeholder="Buscar" /></div
+      ></template>
       <template v-slot:body="props">
         <q-tr :props="props">
           <q-td v-for="col in props.cols" :key="col.name" :props="props">
@@ -51,7 +66,9 @@ const route = useRoute();
 const router = useRouter();
 const id = route.params.id;
 const nombre = route.params.nombre;
-
+const goBack = () => {
+  router.back();
+};
 const apellidos = route.params.apellidos;
 const rows = ref<RowType[]>([]);
 type RowType = {
@@ -116,7 +133,7 @@ const fetchData = async () => {
         'Content-Type': 'application/json',
       },
     };
-    const result = await api.get(`/api/avales-profesor/${id}/`,config);
+    const result = await api.get(`/api/avales-profesor/${id}/`, config);
     rows.value = result.data;
     console.log(rows.value);
   } catch (error) {

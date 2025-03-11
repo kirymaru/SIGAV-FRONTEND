@@ -1,5 +1,5 @@
 <template>
-  <q-page class="row items-center justify-evenly">
+  <q-page class="row justify-evenly">
     <div
       class="column items-center justify-around"
       style="margin-top: 20px; margin-bottom: 20px"
@@ -111,14 +111,28 @@
           dict@reduc.edu.cu. http://infocien.reduc.edu.cu
         </div>
       </div>
-      <q-btn
-        color="primary"
-        rounded
-        label="Exportar a PDF"
-        @click="exportToPDF"
-        class="btn-export mt-4 text-weight-bolder"
-        style="margin-top: 20px; margin-bottom: 20px"
-      />
+      <div>
+        <q-btn
+          icon="arrow_back"
+          rounded
+          size="sm"
+          label="Volver"
+          class="form-item text-weight-bolder"
+          color="primary"
+          style="margin-top: 20px; margin-bottom: 20px; margin-right: 10px"
+          @click="goBack"
+        />
+        <q-btn
+          icon="print"
+          size="sm"
+          color="primary"
+          rounded
+          label="Exportar a PDF"
+          @click="exportToPDF"
+          class="btn-export mt-4 text-weight-bolder"
+          style="margin-top: 20px; margin-bottom: 20px"
+        />
+      </div>
     </div>
   </q-page>
 </template>
@@ -126,6 +140,7 @@
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue';
 import { useQuasar } from 'quasar';
+import { useRouter } from 'vue-router';
 import { useRoute } from 'vue-router';
 import { api } from 'src/boot/axios';
 import jsPDF from 'jspdf';
@@ -150,10 +165,12 @@ interface ResponseItem {
   e_issn: string;
   isbn: string;
 }
-
+const router = useRouter();
 const route = useRoute();
 const id = route.params.id;
-
+const goBack = () => {
+  router.back();
+};
 const response = ref<ResponseItem>({
   apellidos: '',
   departamento: '',
@@ -186,7 +203,10 @@ const fetchData = async () => {
       },
     };
     $q.loading.show();
-    const result = await api.get<ResponseItem>(`/api/profesores/${id}/`,config);
+    const result = await api.get<ResponseItem>(
+      `/api/profesores/${id}/`,
+      config
+    );
     response.value = result.data;
     $q.loading.hide();
   } catch (error) {
@@ -219,7 +239,7 @@ const exportToPDF = () => {
   $q.notify({
     type: 'positive',
     message: '¡Aval Exportado Correctamente!',
-    position: 'top-right',
+    position: 'bottom-right',
   });
 };
 </script>

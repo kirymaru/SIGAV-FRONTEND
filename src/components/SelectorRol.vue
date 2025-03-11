@@ -4,7 +4,7 @@
       <q-card style="width: 300px">
         <q-card-section class="text-bold">Selecciona el Rol:</q-card-section>
         <q-select
-          filled
+          dense
           v-model="selectedPublicType"
           :options="publicTypes"
           label="Roles"

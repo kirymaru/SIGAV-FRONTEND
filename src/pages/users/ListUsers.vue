@@ -2,7 +2,7 @@
   <div class="q-pa-lg">
     <q-table
       title="Lista de Usuarios"
-      title-class="text-bold text-color"
+      title-class="text-bold "
       :rows="users"
       :columns="columns"
       row-key="nombre"
@@ -12,13 +12,14 @@
       no-results-label="No se encontraron resultados para tu búsqueda."
       :loading="isLoading"
       loading-label="Cargando..."
+      rows-per-page-label="Usuarios por Página"
     >
       <template v-slot:top-right>
         <div class="row q-gutter-md">
           <q-btn
             color="primary"
             icon="add"
-            size="md"
+            size="sm"
             align="left"
             dense
             label="Nuevo Usuario"
@@ -89,9 +90,8 @@
         </q-card-section>
 
         <q-card-actions align="right">
-          <q-btn  rounded label="Cancelar" v-close-popup />
+          <q-btn rounded label="Cancelar" v-close-popup />
           <q-btn
-
             rounded
             color="primary"
             label="Guardar"
@@ -104,7 +104,6 @@
 </template>
 <script setup lang="ts">
 import { ref, onMounted, reactive } from 'vue';
-import { useRouter } from 'vue-router';
 import { api } from 'src/boot/axios';
 import { useQuasar } from 'quasar';
 import SelectorRol from 'src/components/SelectorRol.vue';

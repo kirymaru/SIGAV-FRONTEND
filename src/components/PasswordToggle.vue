@@ -1,5 +1,6 @@
 <template>
   <q-input
+    dense
     :type="showPassword ? 'text' : 'password'"
     :model-value="contraseña"
     @update:model-value="emitValue"
@@ -40,7 +41,7 @@ function togglePasswordVisibility() {
 
 function handleInput(value: string) {
   // Actualizar el valor solo si las reglas son válidas
-  if (props.rules?.every(rule => rule(value))) {
+  if (props.rules?.every((rule) => rule(value))) {
     // Directamente actualizamos el valor del modelo sin emitir un evento aquí
     contraseña.value = value;
   }

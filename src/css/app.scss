@@ -41,7 +41,7 @@ body {
 #form-login {
   width: 100%;
   max-width: 500px;
-  background-color: rgba(224, 224, 224, 0.7);
+  background-color: rgba(224, 224, 224, 0.527);
   border-radius: 20px;
   q-gutter-md .form-item-login {
     min-width: 18rem;
@@ -64,4 +64,9 @@ body {
   padding: 20px;
   color: #080808;
   background-color: rgba(255, 255, 255, 0.904);
+}
+
+#btn-fecha {
+  background-color: #2a8cb9;
+  color: #fff;
 }

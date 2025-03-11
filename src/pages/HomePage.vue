@@ -1,15 +1,9 @@
 <template>
-  <q-page>
-    <div class="container card">
-      <img
-        src="/src/assets/logo-bg.gif"
-        alt="Descripción de la imagen"
-        class="centered-image"
-        width="500"
-      />
-    </div>
-  </q-page>
+  <q-page> </q-page>
 </template>
+<script setup lang="ts">
+import ListaAvalesTuto from './AvalesTuto/ListaAvalesTuto.vue';
+</script>
 
 <style scoped>
 .container {

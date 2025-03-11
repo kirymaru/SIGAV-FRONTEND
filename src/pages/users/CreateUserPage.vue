@@ -1,59 +1,92 @@
 <template>
-  <div class="column justify-center items-center">
+  <div
+    class="row justify-around"
+    style="margin-top: 30px; margin-bottom: 30px; margin-left: 20px"
+  >
+    <div>
+      <p class="text-bold text-body1">Nuevo Usuario</p>
+      <p class="text-bold text-body2" style="color: grey">
+        Introduce los datos del usuario
+      </p>
+    </div>
     <q-form @submit="onSubmit" id="form">
-      <div style="margin-top: 10px; margin-bottom: 10px">
-        <h4 class="text-bold text-color">Nuevo Usuario</h4>
-      </div>
       <div class="q-gutter-md column justify-center items-center">
-        <q-input
-          style="width: 300px"
-          autogrow
-          filled
-          class="form-item"
-          v-model="form.email"
-          label="Email"
-          :rules="email_Rules"
-        />
-        <q-input
-          style="width: 250px"
-          filled
-          v-model="form.password"
-          label="Contraseña"
-          :rules="password_Rules"
-        />
-        <q-input
-          filled
-          v-model="form.role"
-          label="Rol"
-          class="form-item"
-          :rules="profile_Rules"
-          @click="showNivActDialog = true"
-        />
-        <q-dialog v-model="showNivActDialog" persistent>
-          <selector-rol
-            v-model="form.role"
-            :public-types="['admin', 'especialista', 'invitado']"
-            :open-dialog-automatically="showNivActDialog"
-            @update:modelValue="form.role = $event"
-            @dialogClosed="hideNivActDialog"
-          />
-        </q-dialog>
         <div>
-          <q-btn
-            class="text-bold"
-            rounded
-            label="Guardar"
-            type="submit"
-            color="primary"
+          <div><p class="text-bold text-body2">Correo Electrónico</p></div>
+
+          <q-input
+            style="width: 250px"
+            autogrow
+            outlined
+            dense
+            class="form-item"
+            v-model="form.email"
+            label="Introduce el correo electrónico"
+            :rules="email_Rules"
           />
         </div>
+        <div>
+          <div><p class="text-bold text-body2">Contraseña</p></div>
+          <q-input
+            style="width: 250px"
+            outlined
+            dense
+            v-model="form.password"
+            label="Introduce la contraseña"
+            :rules="password_Rules"
+          />
+        </div>
+        <div>
+          <div><p class="text-bold text-body2">Rol del Usuario</p></div>
+          <q-input
+            style="width: 250px"
+            outlined
+            dense
+            v-model="form.role"
+            label="Selecciona el Rol"
+            class="form-item"
+            :rules="profile_Rules"
+            @click="showNivActDialog = true"
+          />
+          <q-dialog v-model="showNivActDialog" persistent>
+            <selector-rol
+              v-model="form.role"
+              :public-types="['admin', 'especialista', 'invitado']"
+              :open-dialog-automatically="showNivActDialog"
+              @update:modelValue="form.role = $event"
+              @dialogClosed="hideNivActDialog"
+            />
+          </q-dialog>
+        </div>
       </div>
+        <q-separator inset class="container" />
+        <div class="row justify-end items-center">
+          <q-btn
+            rounded
+            size="sm"
+            label="Volver"
+            class="form-item text-weight-bolder"
+            color="primary"
+            style="margin-top: 20px; margin-bottom: 20px; margin-right: 10px"
+            @click="goBack"
+          />
+          <q-btn
+            rounded
+            size="sm"
+            label="Guardar"
+            type="submit"
+            class="form-item text-weight-bolder"
+            color="primary"
+            style="margin-top: 20px; margin-bottom: 20px"
+          />
+        </div>
+
     </q-form>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, watch, reactive } from 'vue';
+import { ref, reactive } from 'vue';
 import { api } from 'src/boot/axios';
 import SelectorRol from 'src/components/SelectorRol.vue';
 import { useQuasar } from 'quasar';
@@ -77,6 +110,9 @@ const form = reactive<Form>({
 
 const $q = useQuasar();
 const router = useRouter();
+const goBack = () => {
+  router.back();
+};
 const email_Rules: Rule[] = [
   (v) => !!v || 'El Email es requerido',
   (v) =>
@@ -89,7 +125,6 @@ const profile_Rules: Rule[] = [
 ];
 
 //metodos
-
 
 //watchers
 

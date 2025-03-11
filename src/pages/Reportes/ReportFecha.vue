@@ -1,33 +1,39 @@
 <template>
-  <div class="q-gutter-md row justify-evenly align-center">
-    <q-card
-      v-for="(datos, fecha) in datos"
-      :key="fecha"
-      class="row justify-evenly align-center "
+  <div
+    style="padding: 30px"
+    autogrow
+    class="column justify-around items-center q-gutter-md"
+  >
+    <q-expansion-item
+      v-for="(resultados, index) in resultados"
+      :key="`${index}`"
+      class="shadow-1 overflow-hidden"
+      style="border-radius: 30px; width: 800px"
+      icon="explore"
+      label="Departamentos:"
+      header-class="bg-secondary text-black"
+      expand-icon-class="text-white "
     >
-      <div style="width: 500px">
-        <q-card-section >
-          <div class="row justify-between align-center">
-            <div class="text-bold text-h6">{{ fecha }}</div>
+      <template v-slot:header>
+        <q-item-section>
+          <div class="row justify-around">
+            <div class="text-bold text-h6">{{ resultados.fecha }}</div>
             <div class="text-bold text-h6">
-              Total de Avales: {{ datos.total }}
+              Total de Avales: {{ resultados.total }}
             </div>
           </div>
-          <q-separator />
-          <div autogrow class="text-bold">
-            Departamentos:
-            <ul>
-              <li
-                v-for="(count, departamento) in datos.departamentos"
-                :key="departamento"
-              >
-                {{ departamento }}: {{ count }}
-              </li>
-            </ul>
-          </div>
-        </q-card-section>
-      </div>
-    </q-card>
+        </q-item-section>
+      </template>
+
+      <ul>
+        <li
+          v-for="(count, departamento) in resultados.departamentos"
+          :key="departamento"
+        >
+          {{ departamento }}: {{ count }}
+        </li>
+      </ul>
+    </q-expansion-item>
   </div>
 </template>
 
@@ -36,11 +42,13 @@ import { onMounted, ref } from 'vue';
 import { api } from 'src/boot/axios';
 import { useQuasar } from 'quasar';
 
-const datos = ref({});
+const resultados = ref([]);
+
 const $q = useQuasar();
+
 onMounted(async () => {
   try {
-    const authToken = localStorage.getItem('authToken'); // Asume que tienes un authToken almacenado
+    const authToken = localStorage.getItem('authToken');
     const config = {
       headers: {
         Authorization: `Token ${authToken}`,
@@ -52,8 +60,7 @@ onMounted(async () => {
       '/api/reporte-total-avaless-por-fecha/',
       config
     );
-    datos.value = response.data;
-    console.log('Datos cargados:');
+    resultados.value = response.data;
     $q.loading.hide();
   } catch (error) {
     $q.loading.hide();

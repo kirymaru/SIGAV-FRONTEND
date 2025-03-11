@@ -63,14 +63,28 @@
           dict@reduc.edu.cu. http://infocien.reduc.edu.cu
         </div>
       </div>
-      <q-btn
-        color="primary"
-        rounded
-        label="Exportar a PDF"
-        @click="exportToPDF"
-        class="btn-export mt-4 text-weight-bolder"
-        style="margin-top: 20px; margin-bottom: 20px"
-      />
+      <div>
+        <q-btn
+          icon="arrow_back"
+          rounded
+          size="sm"
+          label="Volver"
+          class="form-item text-weight-bolder"
+          color="primary"
+          style="margin-top: 20px; margin-bottom: 20px; margin-right: 10px"
+          @click="goBack"
+        />
+        <q-btn
+          icon="print"
+          size="sm"
+          color="primary"
+          rounded
+          label="Exportar a PDF"
+          @click="exportToPDF"
+          class="btn-export mt-4 text-weight-bolder"
+          style="margin-top: 20px; margin-bottom: 20px"
+        />
+      </div>
     </div>
   </q-page>
 </template>
@@ -78,6 +92,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
 import { useQuasar } from 'quasar';
+import { useRouter } from 'vue-router';
 import { useRoute } from 'vue-router';
 import { api } from 'src/boot/axios';
 import jsPDF from 'jspdf';
@@ -93,9 +108,12 @@ interface ResponseItem {
   titulo_recurso?: string;
   tomo?: string;
 }
-
+const router = useRouter();
 const route = useRoute();
 const id = route.params.id;
+const goBack = () => {
+  router.back();
+};
 const $q = useQuasar();
 const response = ref<ResponseItem>({});
 
@@ -109,7 +127,10 @@ const fetchData = async () => {
       },
     };
     $q.loading.show();
-    const result = await api.get<ResponseItem>(`/api/avales_tuto/${id}/`,config);
+    const result = await api.get<ResponseItem>(
+      `/api/avales_tuto/${id}/`,
+      config
+    );
     response.value = result.data;
     $q.loading.hide();
   } catch (error) {
@@ -121,24 +142,29 @@ const fetchData = async () => {
 onMounted(fetchData);
 
 const exportToPDF = () => {
+  $q.loading.show();
   const pdf = new jsPDF();
-  const element = document.querySelector('.my-card'); // Considera usar un componente Vue para referenciar
+  const element = document.querySelector('.my-card'); // Considera reemplazar esto con un componente Vue personalizado
   if (!element) {
     console.error('No se encontró el elemento.my-card');
     return;
   }
-  html2canvas(element).then((canvas) => {
+  html2canvas(element, { scrollY: -window.scrollY }).then((canvas) => {
+    // Añade scrollY para manejar scroll en la página
     const imgData = canvas.toDataURL('image/png');
     const imgProps = pdf.getImageProperties(imgData);
-    const pdfHeight = pdf.internal.pageSize.getHeight();
-    const pdfWidth = (pdfHeight * imgProps.width) / imgProps.height;
-    pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
-    pdf.save(`Aval de Tutoría Autor:${response.value.nombre} ${response.value.apellidos} ${response.value.fecha}.pdf`);
+    const pdfWidth = pdf.internal.pageSize.getWidth(); // Obtiene el ancho completo de la página PDF
+    const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width; // Calcula la altura proporcionalmente
+    pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight); // Añade la imagen al PDF con las dimensiones calculadas
+    pdf.save(
+      `Aval de Tutoría Autor:${response.value.nombre} ${response.value.apellidos} ${response.value.fecha}.pdf`
+    );
   });
+  $q.loading.hide();
   $q.notify({
     type: 'positive',
     message: '¡Aval Exportado Correctamente!',
-    position: 'top-right',
+    position: 'bottom-right',
   });
 };
 </script>

@@ -1,29 +1,51 @@
 <template>
   <div class="q-pa-lg">
     <q-table
+      bordered
+      dense
+      virtual-scroll
       title="Avales de Tutorías"
-      title-class="text-bold text-color"
+      title-class="text-bold  "
       :rows="rows"
       :columns="columns"
       row-key="id"
       :filter="search"
-      dense
+      :sort="true"
+      sortBy="fecha"
+      sortDesc="true"
       no-data-label="No hay datos disponibles."
       no-results-label="No se encontraron resultados para tu búsqueda."
       :loading="isLoading"
-      loading-label="Cargando..."
-      rows-per-page-label="Avales por Página"
+      rows-per-page-options="7"
     >
+      <template v-slot:loading>
+        <q-inner-loading showing color="primary" />
+      </template>
       <template v-slot:top-right>
         <div class="row q-gutter-md">
           <q-btn
+            v-if="user.isAdmin"
+            label="Nuevo Aval"
+            icon="add"
+            color="primary"
+            size="sm"
+            align="left"
+            class="text-bold"
+            dense
+            to="/crear_aval_tuto"
+          >
+            <q-tooltip> Registrar Nuevo Aval</q-tooltip></q-btn
+          >
+          <q-btn
+            icon="expand_more"
             label="Más Datos"
             color="primary"
             size="sm"
             align="left"
             dense
             to="/detallestuto"
-          />
+            ><q-tooltip> Mostrar más Datos </q-tooltip></q-btn
+          >
           <q-input dense outlined v-model="search" placeholder="Buscar" />
         </div>
       </template>
@@ -66,12 +88,12 @@
         </q-tr>
       </template>
     </q-table>
-    <q-dialog v-model="editDialogOpen">
-      <q-card style="width: 400px">
+    <q-dialog v-model="editDialogOpen" backdrop-filter="blur(4px)">
+      <q-card style="width: 500px; height: 500px">
         <q-card-section>
-          <div class="text-h6 text-color">Editar Recurso</div>
+          <div class="text-h6">Editar Aval</div>
         </q-card-section>
-
+        <q-separator inset />
         <q-card-section>
           <q-input autogrow v-model="editForm.nombre" label="Nombre" />
           <q-input autogrow v-model="editForm.apellidos" label="Apellidos" />
@@ -323,7 +345,7 @@ const saveEdit = async () => {
   $q.notify({
     type: 'positive',
     message: '¡Aval Actualizado Correctamente!',
-    position: 'top-right',
+    position: 'bottom-right',
   });
 };
 
@@ -358,7 +380,7 @@ async function eliminar(row: { id: null }) {
             $q.notify({
               type: 'positive', // Cambiado a positive para indicar éxito
               message: '¡Aval Eliminado Correctamente!',
-              position: 'top-right',
+              position: 'bottom-right',
             });
           })
           .catch((error) => {
@@ -366,7 +388,7 @@ async function eliminar(row: { id: null }) {
             $q.notify({
               type: 'negative',
               message: 'Hubo un error al eliminar el Aval.',
-              position: 'top-right',
+              position: 'bottom-right',
             });
           });
       });
@@ -375,3 +397,11 @@ async function eliminar(row: { id: null }) {
   }
 }
 </script>
+<style scoped>
+.container-global {
+  width: 100%; /* Usamos un ancho del 100% por defecto */
+  max-width: 1600px; /* Limita el ancho máximo a 1600px */
+  margin: 0 auto; /* Centra el contenedor */
+  padding: 0 20px; /* Añade un pequeño padding para evitar que el contenido toque los bordes */
+}
+</style>
