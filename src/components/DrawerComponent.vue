@@ -1,5 +1,10 @@
 <template>
   <div>
+    <q-item to="/home" clickable v-close-popup>
+      <q-item-section>
+        <q-item-label class="text-weight-bolder">Inicio</q-item-label>
+      </q-item-section>
+    </q-item>
     <q-expansion-item
       v-for="category in categorizedItems"
       :key="category.title"

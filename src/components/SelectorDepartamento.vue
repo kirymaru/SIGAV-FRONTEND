@@ -1,23 +1,27 @@
 <template>
   <div>
     <q-dialog v-model="firstDialog" persistent>
-      <q-card style="width: 300px">
-        <q-card-section class="text-bold"
-          >Selecciona la Facultad:</q-card-section
-        >
-        <q-select
-          class="text-bold"
-          dense
-          v-model="selectedFaculty"
-          :options="faculty"
-          label="Facultades"
-          @input="selectFaculty"
-        />
+      <q-card style="width: 380px">
+        <q-card-section class="text-bold q-gutter-sm"
+          >Selecciona la Facultad:
+          <div>
+            <q-select
+              class="text-bold"
+              dense
+              style="width: 350px"
+              v-model="selectedFaculty"
+              :options="faculty"
+              label="Facultades"
+              @input="selectFaculty"
+            />
+          </div>
+        </q-card-section>
         <q-card-actions align="right">
-          <q-btn flat label="Cancel" @click="handleCloseAndEmit" />
+          <q-btn flat label="Cancelar" @click="handleCloseAndEmit" />
           <q-btn
+            color="primary"
             flat
-            label="OK"
+            label="Aceptar"
             @click="() => selectFaculty(selectedFaculty)"
           />
         </q-card-actions>
@@ -25,23 +29,24 @@
     </q-dialog>
 
     <q-dialog v-model="secondDialog" persistent>
-      <q-card style="width: 300px">
-        <q-card-section class="text-bold"
-          >Selecciona un Departamento:</q-card-section
-        >
-        <q-select
-          dense
-          v-model="selectedDepartment"
-          :options="selectedDepartmentOptions"
-          label="Departamentos"
-          @input="selectDepartment"
-        />
+      <q-card style="width: 380px">
+        <q-card-section class="text-bold q-gutter-sm"
+          >Selecciona un Departamento:
+          <div>
+            <q-select
+              dense
+              v-model="selectedDepartment"
+              :options="selectedDepartmentOptions"
+              label="Departamentos"
+              @input="selectDepartment"
+            /></div
+        ></q-card-section>
         <q-card-actions align="right">
-          <q-btn flat label="Cancel"  @click="closeSecondDialog" />
+          <q-btn flat label="Cancelar" @click="closeSecondDialog" />
           <q-btn
-
+            color="primary"
             flat
-            label="OK"
+            label="Aceptar"
             @click="() => selectDepartment(selectedDepartment)"
           />
         </q-card-actions>

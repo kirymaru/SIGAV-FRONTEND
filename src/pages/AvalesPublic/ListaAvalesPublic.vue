@@ -223,7 +223,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, reactive, watch, toRefs, watchEffect } from 'vue';
+import { ref, onMounted, reactive, watch, toRefs } from 'vue';
 import { useRouter } from 'vue-router';
 import SelectorDepartamento from 'src/components/SelectorDepartamento.vue';
 import SelectorTipoRecurso from 'src/components/SelectorTipoRecurso.vue';

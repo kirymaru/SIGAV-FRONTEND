@@ -1,20 +1,11 @@
 <template>
-  <q-page> </q-page>
+  <div>
+    <chart-component />
+  </div>
 </template>
-<script setup lang="ts">
-import ListaAvalesTuto from './AvalesTuto/ListaAvalesTuto.vue';
+
+<script setup>
+import ChartComponent from 'src/components/ChartComponent.vue';
+
+// You can use the imported component here
 </script>
-
-<style scoped>
-.container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-}
-
-.centered-image {
-  max-width: 100%;
-  height: auto;
-}
-</style>
