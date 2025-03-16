@@ -1,75 +1,77 @@
 <template>
   <div class="q-pa-lg">
-    <q-card class="column q-gutter-y-md rounded-card">
-      <div class="column text-subtitle1 text-bold">
-        <q-card-section>
-          <div class="text-h6 text-bold">
-            Cantidad de Avales por Departamento y Tipo de Aval :
-          </div>
-          <q-separator />
-        </q-card-section>
-        <q-card-section>
-          <div>
-            <p class="text-bold text-body2">Departamento de Trabajo</p>
-          </div>
-          <q-input
-            style="max-width: 250px"
-            autogrow
-            outlined
-            dense
-            v-model="departamentoSeleccionado"
-            label="Seleccione un Departamento"
-            @click="showSelectorDepartamento = true"
-            @update:model-value="mostrarAvales"
-          />
-          <q-dialog v-model="showSelectorDepartamento" persistent>
-            <SelectorDepartamento
-              v-model="departamentoSeleccionado"
-              :open-first-dialog-automatically="true"
-              @close-first-dialog="closeFirstDialogAndUpdateModel"
-              @update:model-value="mostrarAvales"
-            />
-          </q-dialog>
-        </q-card-section>
-      </div>
-      <q-separator />
-      <q-card-section>
-        <div class="row justify-around text-body1 text-bold">
-          <div>
-            Aval de Publicación: {{ datos?.avales_por_tipo['Profesor'] }}
-          </div>
-          <div>
-            Aval de Tutoría: {{ datos?.avales_por_tipo['avales_tuto'] }}
-          </div>
-          <div>
-            Aval de Bibliografía: {{ datos?.avales_por_tipo['avales_biblio'] }}
-          </div>
-          <div>Total: {{ datos?.total_avales }}</div>
+    <q-card class="rounded-card shadow-5">
+      <q-card-section class="bg-gradient-primary text-white">
+        <div class="text-h5 text-weight-bold q-pb-md">
+          📊 Distribución de Avales por Facultad y Departamento
         </div>
+        <q-separator color="white" />
       </q-card-section>
-    </q-card>
-    <q-card class="rounded-card">
+
       <q-card-section>
-        <div class="text-h6 text-bold">
-          Cantidad de Avales por Departamento y Facultad:
+        <div class="row q-col-gutter-lg">
+          <div
+            v-for="(departamentos, facultad) in avalesPorFacultad"
+            :key="facultad"
+            class="col-12 col-sm-6 col-md-4 col-lg-3"
+          >
+            <q-card class="facultad-card">
+              <q-card-section class="bg-blue-1 text-primary">
+                <div class="row items-center">
+                  <q-icon name="school" size="sm" class="q-mr-sm" />
+                  <div class="text-h6 text-weight-bold">{{ facultad }}</div>
+                  <q-space />
+                  <q-badge rounded color="primary">
+                    Total: {{ departamentos.total || 0 }}
+                  </q-badge>
+                </div>
+              </q-card-section>
+
+              <q-separator />
+
+              <q-card-section class="q-pt-none">
+                <q-list>
+                  <q-item
+                    v-for="depto in Object.keys(departamentos).filter(
+                      (k) => k !== 'total'
+                    )"
+                    :key="depto"
+                    class="q-py-xs"
+                  >
+                    <q-item-section>
+                      <div class="row items-center">
+                        <q-icon
+                          name="apartment"
+                          size="xs"
+                          color="grey-6"
+                          class="q-mr-sm"
+                        />
+                        <div class="text-caption text-weight-medium">
+                          {{ depto }}
+                        </div>
+                      </div>
+                    </q-item-section>
+
+                    <q-item-section side>
+                      <q-badge color="green" class="text-weight-bold">
+                        {{ departamentos[depto] }}
+                      </q-badge>
+                    </q-item-section>
+                  </q-item>
+                </q-list>
+              </q-card-section>
+            </q-card>
+          </div>
         </div>
-        <q-separator />
-      </q-card-section>
-      <q-card-section class="flex-container">
+
         <div
-          class="flex-item"
-          v-for="(departamentos, facultad) in avalesPorFacultad"
-          :key="facultad"
+          v-if="!Object.keys(avalesPorFacultad).length"
+          class="text-center q-pa-xl"
         >
-          <strong>{{ facultad }}:</strong>
-          <ul class="text-bold">
-            <li
-              v-for="departamento in Object.keys(departamentos)"
-              :key="departamento"
-            >
-              {{ departamento }}: {{ departamentos[departamento] || 0 }}
-            </li>
-          </ul>
+          <q-icon name="warning" size="xl" color="grey-5" />
+          <div class="text-h6 text-grey-5 q-mt-md">
+            No hay datos disponibles
+          </div>
         </div>
       </q-card-section>
     </q-card>
@@ -287,4 +289,22 @@ watch(departamentoSeleccionado, async (nuevoValor, antiguoValor) => {
   }
 });
 </script>
-<style scoped></style>
+<style scoped>
+.bg-gradient-primary {
+  background: linear-gradient(145deg, #2c387e, #2196f3);
+}
+
+.facultad-card {
+  transition: transform 0.3s ease;
+  height: 100%;
+}
+
+.facultad-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.q-item:hover {
+  background-color: rgba(0, 0, 0, 0.03);
+}
+</style>

@@ -1,6 +1,6 @@
 <template>
   <div>
-    <q-card class="q-pa-md" style="width: 800px">
+    <q-card>
       <canvas ref="chartCanvas"></canvas>
     </q-card>
   </div>

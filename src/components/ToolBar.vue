@@ -1,103 +1,134 @@
 <template>
-  <div>
-    <q-header>
-      <q-toolbar class="bg-color">
-        <q-btn
-          dense
-          flat
-          round
-          icon="menu"
-          color="black"
-          class="fondo-transparente"
-          @click="toggleLeftDrawer"
-        />
-        <q-avatar size="50px">
-          <img src="src/assets/logotoolbar.png" />
+  <q-header elevated class="bg-gradient-primary text-white shadow-4">
+    <q-toolbar>
+      <!-- Botón menú -->
+      <q-btn
+        flat
+        dense
+        round
+        icon="menu"
+        aria-label="Menú"
+        class="q-mr-sm fondo-transparente text-white"
+        @click="toggleLeftDrawer"
+      />
+
+      <!-- Logo y título -->
+      <div class="row items-center">
+        <q-avatar size="50px" class="q-mr-sm">
+          <img src="src/assets/logotoolbar.png" alt="Logo SIGAV" />
         </q-avatar>
+        <q-toolbar-title class="text-h5 text-weight-bold">
+          SIGAV
+          <div class="text-caption text-weight-light">
+            Gestión de Avales Académicos
+          </div>
+        </q-toolbar-title>
+      </div>
 
-        <q-toolbar-title class="text-black text-gliker">SIGAV</q-toolbar-title>
+      <q-space />
 
-        <q-btn
-          dense
-          flat
-          round
-          size="20px"
-          icon="account_circle"
-          color="black"
-          class="fondo-transparente"
-        >
-          <q-menu>
-            <div class="row no-wrap q-pa-md">
-              <div class="column">
-                <div class="text-h6 text-bold q-mb-md">{{ usuario.email }}</div>
-                <div>
-                  <q-separator inset class="q-mx-lg" />
-                  <q-list>
-                    <q-item
-                      v-if="user.isAdmin"
-                      to="/Usuarios"
-                      clickable
-                      v-close-popup
-                    >
-                      <q-item-section>
-                        <q-item-label icon="account_circle" class="text-bold"
-                          >Administración de Usuarios</q-item-label
-                        >
-                      </q-item-section>
-                    </q-item>
-                    <q-item clickable v-close-popup @click="logout">
-                      <q-item-section>
-                        <q-item-label class="text-bold"
-                          >Cerrar Sesión</q-item-label
-                        >
-                      </q-item-section>
-                    </q-item>
-                    <q-separator inset class="q-mx-lg" />
-                    <q-item to="/acerca_de" clickable v-close-popup>
-                      <q-item-section>
-                        <q-item-label class="text-bold"
-                          >Acerca De SIGAV</q-item-label
-                        >
-                      </q-item-section>
-                    </q-item>
-                  </q-list>
-                </div>
-              </div>
-              <q-separator vertical inset class="q-mx-lg" />
-
-              <div class="column justify-center items-center">
-                <q-avatar size="72px">
-                  <q-icon name="account_circle" size="72px" />
-                </q-avatar>
-
-                <div class="text-subtitle1 q-mt-md q-mb-xs">
-                  {{ formattedRole }}
-                </div>
-              </div>
+      <!-- Menú usuario -->
+      <q-btn
+        round
+        flat
+        dense
+        class="q-mr-sm fondo-transparente text-white"
+        :icon="$q.screen.lt.md ? 'account_circle' : ''"
+      >
+        <div v-if="$q.screen.gt.sm" class="row items-center">
+          <q-avatar size="40px" class="q-mr-sm">
+            <q-icon name="account_circle" size="40px" />
+          </q-avatar>
+          <div class="column text-left">
+            <div class="text-weight-bold">{{ abbreviatedUsername }}</div>
+            <div class="text-caption">
+              {{ formattedRole }}
             </div>
-          </q-menu>
-        </q-btn>
-      </q-toolbar>
-    </q-header>
+          </div>
+        </div>
 
-    <q-drawer
-      show-if-above
-      v-model="leftDrawerOpen"
-      :width="250"
-      :breakpoint="700"
-      side="left"
-      class="text-black bg-color"
-      elevated
-      overlay
-    >
-      <drawer-component />
-      <q-footer class="row justify-center text-bold bg-color">
-        Versión 1.0
-      </q-footer>
-    </q-drawer>
-  </div>
+        <q-menu
+          transition-show="jump-down"
+          transition-hide="jump-up"
+          class="shadow-5"
+        >
+          <div class="row no-wrap q-pa-lg" style="min-width: 300px">
+            <!-- Sección izquierda -->
+            <div class="column items-center q-pr-lg">
+              <q-avatar size="80px" class="q-mb-sm">
+                <q-icon name="account_circle" size="80px" />
+              </q-avatar>
+              <q-badge color="primary" class="text-uppercase">
+                {{ formattedRole }}
+              </q-badge>
+            </div>
+
+            <q-separator vertical inset class="q-mx-lg" />
+
+            <!-- Sección derecha -->
+            <div class="column">
+              <q-list class="rounded-borders" dense>
+                <q-item
+                  v-if="user.isAdmin"
+                  clickable
+                  v-ripple
+                  class="text-primary"
+                  to="/Usuarios"
+                >
+                  <q-item-section avatar>
+                    <q-icon name="people" />
+                  </q-item-section>
+                  <q-item-section>Administrar Usuarios</q-item-section>
+                </q-item>
+
+                <q-item clickable v-ripple to="/acerca_de">
+                  <q-item-section avatar>
+                    <q-icon name="info" />
+                  </q-item-section>
+                  <q-item-section>Acerca de SIGAV</q-item-section>
+                </q-item>
+
+                <q-separator spaced />
+
+                <q-item
+                  clickable
+                  v-ripple
+                  class="text-negative"
+                  @click="logout"
+                >
+                  <q-item-section avatar>
+                    <q-icon name="logout" />
+                  </q-item-section>
+                  <q-item-section>Cerrar Sesión</q-item-section>
+                </q-item>
+              </q-list>
+            </div>
+          </div>
+        </q-menu>
+      </q-btn>
+    </q-toolbar>
+  </q-header>
+
+  <!-- Drawer -->
+  <q-drawer
+    v-model="leftDrawerOpen"
+    :width="280"
+    side="left"
+    bordered
+    overlay
+    elevated
+    class="bg-grey-2"
+    :breakpoint="700"
+  >
+    <drawer-component />
+
+    <q-separator class="q-mt-auto" />
+    <q-footer class="q-py-sm text-center text-caption text-grey-7">
+      <div>Versión 1.0</div>
+      <div class="text-caption">© 2024 SIGAV</div>
+    </q-footer>
+  </q-drawer>
 </template>
-
 <script setup lang="ts">
 import DrawerComponent from 'src/components/DrawerComponent.vue';
 import { ref, onMounted, computed } from 'vue';
@@ -153,6 +184,16 @@ const toggleLeftDrawer = () => {
   leftDrawerOpen.value = !leftDrawerOpen.value;
 };
 
+const abbreviatedUsername = computed(() => {
+  if (!usuario.value.email) return 'Usuario';
+
+  // Tomar la parte antes del @ si es email
+  const username = usuario.value.email.split('@')[0];
+
+  // Acortar a 15 caracteres máximo
+  return username.length > 10 ? `${username.substring(0, 9)}...` : username;
+});
+
 const formattedRole = computed(() => {
   switch (usuario.value.role.toLowerCase()) {
     case 'admin':
@@ -170,47 +211,29 @@ onMounted(fetchUserData);
 </script>
 
 <style scoped>
-.fixed-toolbar {
-  top: 0;
-  left: 0;
-  width: 100%;
-
-  background-color: white; /* Color de fondo para que la toolbar sea visible sobre el contenido */
-  box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+.bg-gradient-primary {
+  background: linear-gradient(145deg, #2c3e50, #3498db);
 }
 
-.q-mt-lg {
-  margin-bottom: 70px; /* Añade un margen superior para el contenido debajo de la toolbar */
+.q-header {
+  transition: all 0.3s ease;
 }
 
-@media (max-width: 1600px) {
-  .container-global {
-    width: 95%; /* Ajusta el ancho en pantallas más pequeñas */
-  }
+.q-menu {
+  border-radius: 12px;
 }
 
-@media (max-width: 1200px) {
-  .container-global {
-    width: 90%;
-  }
+.q-item:hover {
+  background: rgba(0, 0, 0, 0.05);
+  transform: translateX(5px);
+  transition: all 0.2s ease;
 }
 
-@media (max-width: 992px) {
-  .container-global {
-    width: 85%;
-  }
+.q-drawer {
+  box-shadow: 4px 0 15px rgba(0, 0, 0, 0.1);
 }
 
-@media (max-width: 768px) {
-  .container-global {
-    width: 80%;
-  }
-}
-
-@media (max-width: 576px) {
-  .container-global {
-    width: 100%; /* En pantallas muy pequeñas, que ocupe el 100% del ancho */
-    padding: 0 0px; /* Reduce el padding en móviles */
-  }
+.q-footer {
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
 }
 </style>
